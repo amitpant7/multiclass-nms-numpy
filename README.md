@@ -52,5 +52,5 @@ This project is licensed under the MIT License.
 
 ## Acknowledgments
 
-- Based on the Fast R-CNN implementation by Ross Girshick
+- Based on the nms from Fast R-CNN implementation by Ross Girshick
 - Used in NanoDet post-processing pipeline 
