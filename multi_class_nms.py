@@ -6,6 +6,7 @@ import numpy as np
 # Used in NanoDet post processing.
 # --------------------------------------------------------
 
+import numpy as np
 def multi_class_nms(bboxes, scores, nms_thresh=0.4, min_conf=0.3):
     """
     Applies Non-Maximum Suppression (NMS) separately for each class in a multi-class object detection setting.
@@ -37,18 +38,19 @@ def multi_class_nms(bboxes, scores, nms_thresh=0.4, min_conf=0.3):
     filtered_bboxes = projected_bboxes[conf_mask]
     filtered_scores = scores[conf_mask]
     
-    # Class indices of remaining boxes
-    class_indices = np.tile(np.arange(num_classes), (scores.shape[0], 1))[conf_mask]
+    indecies = np.array(list(zip(*np.nonzero(conf_mask))))
 
     # Apply NMS
     keep_indices = nms(filtered_bboxes, filtered_scores, nms_thresh)
 
-    # Select results
-    sel_bboxes = filtered_bboxes[keep_indices]
-    sel_scores = filtered_scores[keep_indices]
-    cls_idx = class_indices[keep_indices]
+    # Select results, mapping to original pre-projected bboxes.
+    bbox_idx = indecies[keep_indices]
+    sel_bboxes = bboxes[bbox_idx]
+    sel_scores = scores[bbox_idx]
+    sel_classes = bbox_idx[:, 1]
 
-    return sel_bboxes, sel_scores, cls_idx
+    return sel_bboxes, sel_scores, sel_classes
+
 
 
 
