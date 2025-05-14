@@ -18,9 +18,9 @@ def multi_class_nms(bboxes, scores, nms_thresh=0.4, min_conf=0.3):
         min_conf (float): Minimum confidence threshold to filter detections before NMS.
 
     Returns:
-        sel_bboxes (np.ndarray): Filtered bounding boxes after NMS.
-        sel_scores (np.ndarray): Corresponding confidence scores.
-        cls_id (np.ndarray): Class indices of the selected bounding boxes.
+        keep (np.ndarray): Indicies that correspond to filtered bounding boxes in the input array.
+        classes (np.ndarray): Class indices of the selected bounding boxes.
+        scores (np.ndarray): Corresponding confidence scores.
     """
     num_classes = scores.shape[1]
     
@@ -39,19 +39,16 @@ def multi_class_nms(bboxes, scores, nms_thresh=0.4, min_conf=0.3):
     filtered_scores = scores[conf_mask]
     
     indecies = np.array(list(zip(*np.nonzero(conf_mask))))
-
+    
     # Apply NMS
-    keep_indices = nms(filtered_bboxes, filtered_scores, nms_thresh)
+    keep_indices = indecies[nms(filtered_bboxes, filtered_scores, nms_thresh)]
 
-    # Select results, mapping to original pre-projected bboxes.
-    bbox_idx = indecies[keep_indices]
-    sel_bboxes = bboxes[bbox_idx]
-    sel_scores = scores[bbox_idx]
-    sel_classes = bbox_idx[:, 1]
+    #selecting bbox indicies and class
+    keep = keep_indices[:, 0]
+    classes = keep_indices[:, 1]
+    scores = scores[keep, classes]
 
-    return sel_bboxes, sel_scores, sel_classes
-
-
+    return keep, classes, scores
 
 
 
